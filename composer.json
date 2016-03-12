@@ -1,6 +1,12 @@
 {
-    "require": {
-        "slimauth/slimauth": "^0.1.0",
-        "slim/slim": "^3.3"
+  "require": {
+    "slimauth/slimauth": "^0.1.0",
+    "slim/slim": "^3.3",
+    "slim/twig-view": "^2.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "ToyToyToy\\": "app/"
     }
+  }
 }
