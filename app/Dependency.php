@@ -12,5 +12,9 @@ class Dependency
             $view->addExtension(new \Twig_Extension_Debug());
             return $view;
         };
+
+        $container['csrf'] = function($c) {
+            return new \Slim\Csrf\Guard();
+        };
     }
 }
