@@ -10,7 +10,8 @@
     "robmorgan/phinx": "^0.5.3"
   },
   "scripts": {
-    "phinx": "phinx"
+    "phinx": "phinx",
+    "serve": "php -S localhost:1234 -t public"
   },
   "autoload": {
     "psr-4": {

@@ -16,5 +16,10 @@ class Dependency
         $container['csrf'] = function($c) {
             return new \Slim\Csrf\Guard();
         };
+
+        $capsule = new \Illuminate\Database\Capsule\Manager();
+        $capsule->addConnection($container->get('settings')['db']);
+        $capsule->setAsGlobal();
+        $capsule->bootEloquent();
     }
 }
