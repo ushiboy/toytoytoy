@@ -5,7 +5,10 @@ class Config
 {
     static function get()
     {
-        $environment = getenv('ENV') ?? 'development';
+        $environment = getenv('ENV');
+        if (strlen($environment) === 0) {
+            $environment = 'development';
+        }
         return [
             'settings' => [
                 'determineRouteBeforeAppMiddleware' => false,
