@@ -7,15 +7,22 @@
     "illuminate/database": "^5.2"
   },
   "require-dev": {
-    "robmorgan/phinx": "^0.5.3"
+    "robmorgan/phinx": "^0.5.3",
+    "phpunit/phpunit": "^5.2"
   },
   "scripts": {
     "phinx": "phinx",
+    "test": "phpunit",
     "serve": "php -S localhost:1234 -t public"
   },
   "autoload": {
     "psr-4": {
       "ToyToyToy\\": "app/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ToyToyToy\\Tests\\": "tests/"
     }
   }
 }
