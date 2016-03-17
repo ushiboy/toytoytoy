@@ -1,5 +1,6 @@
 <?php
 namespace ToyToyToy\Controller;
+
 use \ToyToyToy\Model\User;
 
 class Users extends Base
@@ -15,6 +16,7 @@ class Users extends Base
         $params = $request->getParsedBody();
 
         $user = new User($params);
+        $user->setPassword($params['password'], $params['password_confirmation']);
         $user->save();
 
         return $this->view->render($response, 'index.html', [
