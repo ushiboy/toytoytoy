@@ -1,13 +1,17 @@
 <?php
 namespace ToyToyToy\Mixin;
-use \Exception;
+use ToyToyToy\Exception\InvalidPasswordException;
 
 trait HasSecurePassword
 {
 
+    public static $algo = PASSWORD_BCRYPT;
+    public static $cost = 10;
+
     private $password;
     private $passwordConfirmation;
     private $passwordDigest;
+
 
     public function authenticate($unencryptedPassword)
     {
@@ -42,10 +46,13 @@ trait HasSecurePassword
     public function setPassword($unencryptedPassword)
     {
         if ($unencryptedPassword === null) {
+            $this->password = null;
             $this->passwordDigest = null;
         } else if (!empty($unencryptedPassword)) {
             $this->password = $unencryptedPassword;
-            $this->passwordDigest = password_hash($unencryptedPassword, PASSWORD_BCRYPT);
+            $this->passwordDigest = password_hash($unencryptedPassword, self::$algo, [
+                'cost' => self::$cost
+            ]);
         }
     }
 
@@ -60,9 +67,4 @@ trait HasSecurePassword
             throw new InvalidPasswordException();
         }
     }
-}
-
-class InvalidPasswordException extends Exception
-{
-
 }
