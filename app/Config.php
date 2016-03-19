@@ -3,7 +3,7 @@ namespace ToyToyToy;
 
 class Config
 {
-    static function get()
+    public static function get()
     {
         $environment = getenv('ENV');
         if (strlen($environment) === 0) {
@@ -28,4 +28,4 @@ class Config
             ]
         ];
     }
-};
+}

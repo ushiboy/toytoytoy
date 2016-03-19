@@ -7,6 +7,22 @@ use ToyToyToy\Exception\InvalidPasswordException;
 class User
 {
     use HasSecurePassword;
+
+    public $passwordDigest;
+
+    public function __construct($passwordDigest = null) {
+        $this->passwordDigest = $passwordDigest;
+    }
+
+    protected function getPasswordDigest()
+    {
+        return $this->passwordDigest;
+    }
+
+    protected function applyPasswordDigest($passwordDigest)
+    {
+        $this->passwordDigest = $passwordDigest;
+    }
 }
 
 class HasSecurePasswordTest extends \PHPUnit_Framework_TestCase
@@ -18,30 +34,50 @@ class HasSecurePasswordTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->user = new User();
+        $this->user = new User(self::TEST_PASS_DIGEST);
     }
 
     public function testAuthenticate()
     {
-        $user = $this->user;
-        $user->passwordDigest = self::TEST_PASS_DIGEST;
-        $this->assertTrue($user->authenticate('test'));
+        $this->assertTrue($this->user->authenticate('test'));
     }
 
     public function testAuthenticate__when_password_is_not_match()
     {
-        $user = $this->user;
-        $user->passwordDigest = self::TEST_PASS_DIGEST;
-        $this->assertFalse($user->authenticate('test*'));
+        $this->assertFalse($this->user->authenticate('test*'));
+    }
+
+    public function testSetPassword()
+    {
+        $user = new User();
+        $password = '012345678901234567890123456789012345678901234567890123456789012345678912';
+        $user->setPassword($password, $password);
+        $this->assertNotNull($user->passwordDigest);
     }
 
     /**
      * @expectedException ToyToyToy\Exception\InvalidPasswordException
      */
-    public function testValidatePassword()
+    public function testSetPassword__when_password_is_empty()
     {
-        $this->user->password = 'test';
-        $this->user->passwordConfirmation = 'test+';
-        $this->user->validatePassword();
+        $password = '';
+        $this->user->setPassword($password, $password);
+    }
+
+    /**
+     * @expectedException ToyToyToy\Exception\InvalidPasswordException
+     */
+    public function testSetPassword__when_password_length_over_allowed_max()
+    {
+        $password = '0123456789012345678901234567890123456789012345678901234567890123456789123';
+        $this->user->setPassword($password, $password);
+    }
+
+    /**
+     * @expectedException ToyToyToy\Exception\InvalidPasswordException
+     */
+    public function testSetPassword__when_passwordConfirmation_is_not_match()
+    {
+        $this->user->setPassword('test', 'test+');
     }
 }

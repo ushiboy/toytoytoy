@@ -1,70 +1,44 @@
 <?php
 namespace ToyToyToy\Mixin;
+
 use ToyToyToy\Exception\InvalidPasswordException;
 
 trait HasSecurePassword
 {
 
-    public static $algo = PASSWORD_BCRYPT;
-    public static $cost = 10;
-
-    private $password;
-    private $passwordConfirmation;
-    private $passwordDigest;
-
+    public static $maxPasswordLengthAllowed = 72;
 
     public function authenticate($unencryptedPassword)
     {
-        return password_verify($unencryptedPassword, $this->passwordDigest);
+        return password_verify($unencryptedPassword, $this->getPasswordDigest());
     }
 
-    public function __set($name, $value)
+    public function setPassword($password, $passwordConfirmation)
     {
-        if ($name === 'password') {
-            $this->setPassword($value);
-        } else if ($name === 'passwordConfirmation') {
-            $this->setPasswordConfirmation($value);
-        } else if ($name === 'passwordDigest') {
-            $this->passwordDigest = $value;
-        } else {
-            parent::__set($name, $value);
+        $this->validatePassword($password, $passwordConfirmation);
+        $passwordDigest = $this->createPasswordDigest($password);
+        $this->applyPasswordDigest($passwordDigest);
+    }
+
+    protected function createPasswordDigest($unencryptedPassword)
+    {
+        return password_hash($unencryptedPassword, PASSWORD_BCRYPT, [
+            'cost' => 10
+        ]);
+    }
+
+    protected function validatePassword($password, $passwordConfirmation)
+    {
+        if (empty($password)) {
+            throw new InvalidPasswordException('password required');
+        } elseif (strlen($password) > self::$maxPasswordLengthAllowed) {
+            throw new InvalidPasswordException('invalid password maximum length');
+        } elseif ($password !== $passwordConfirmation) {
+            throw new InvalidPasswordException('confirumation is not match');
         }
     }
 
-    public function __get($name)
-    {
-        if ($name === 'password') {
-            return $this->password;
-        } else if ($name === 'passwordConfirmation') {
-            return $this->passwordConfirmation;
-        } else if ($name === 'passwordDigest') {
-            return $this->passwordDigest;
-        }
-        return parent::__get($name);
-    }
+    abstract protected function getPasswordDigest();
 
-    public function setPassword($unencryptedPassword)
-    {
-        if ($unencryptedPassword === null) {
-            $this->password = null;
-            $this->passwordDigest = null;
-        } else if (!empty($unencryptedPassword)) {
-            $this->password = $unencryptedPassword;
-            $this->passwordDigest = password_hash($unencryptedPassword, self::$algo, [
-                'cost' => self::$cost
-            ]);
-        }
-    }
-
-    public function setPasswordConfirmation($unencryptedPassword)
-    {
-        $this->passwordConfirmation = $unencryptedPassword;
-    }
-
-    public function validatePassword()
-    {
-        if ($this->password !== $this->passwordConfirmation) {
-            throw new InvalidPasswordException();
-        }
-    }
+    abstract protected function applyPasswordDigest($passwordDigest);
 }
