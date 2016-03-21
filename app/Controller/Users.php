@@ -1,7 +1,7 @@
 <?php
 namespace ToyToyToy\Controller;
 
-use \ToyToyToy\Model\User;
+use ToyToyToy\Model\User;
 
 class Users extends Base
 {
