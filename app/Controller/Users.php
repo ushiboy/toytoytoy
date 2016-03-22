@@ -26,4 +26,14 @@ class Users extends Base
             'value' => $value
         ]);
     }
+
+    public function signin($request, $response)
+    {
+        $parsedBody = $request->getParsedBody();
+        $user = User::where('email', '=', $parsedBody['email'])->get()->toArray()[0];
+        if ($user && $user->authenticate($parsedBody['password'])) {
+            $this->get('auth')->permit($user->id);
+        }
+        return $response->withRedirect('/', 301);
+    }
 }
