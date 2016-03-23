@@ -36,4 +36,10 @@ class Users extends Base
         }
         return $response->withRedirect('/', 301);
     }
+
+    public function signout($request, $response)
+    {
+        $this->auth->clear();
+        return $response->withRedirect('/', 301);
+    }
 }

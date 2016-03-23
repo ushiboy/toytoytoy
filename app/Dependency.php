@@ -21,7 +21,7 @@ class Dependency
 
         $container['auth'] = function ($c) {
             return new \SlimAuth\Auth(function($id) {
-                return User::findOne($id);
+                return User::find($id);
             });
         };
 
