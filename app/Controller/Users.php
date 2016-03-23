@@ -30,9 +30,9 @@ class Users extends Base
     public function signin($request, $response)
     {
         $parsedBody = $request->getParsedBody();
-        $user = User::where('email', '=', $parsedBody['email'])->get()->toArray()[0];
+        $user = User::findByEmail($parsedBody['email']);
         if ($user && $user->authenticate($parsedBody['password'])) {
-            $this->get('auth')->permit($user->id);
+            $this->auth->permit($user->id);
         }
         return $response->withRedirect('/', 301);
     }

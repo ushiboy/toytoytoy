@@ -37,4 +37,8 @@ class User extends Eloquent\Model
         $this->validate();
         return parent::save($options);
     }
+
+    static public function findByEmail($email) {
+        return self::where('email', '=', $email)->get()->first();
+    }
 }
