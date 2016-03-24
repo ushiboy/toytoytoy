@@ -2,7 +2,7 @@
 namespace ToyToyToy\Tests\Mixin;
 
 use ToyToyToy\Mixin\HasSecurePassword;
-use ToyToyToy\Exception\InvalidPasswordException;
+use \InvalidArgumentException;
 
 class User
 {
@@ -47,37 +47,29 @@ class HasSecurePasswordTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->user->authenticate('test*'));
     }
 
-    public function testSetPassword()
+    public function testRegisterPassword()
     {
         $user = new User();
         $password = '012345678901234567890123456789012345678901234567890123456789012345678912';
-        $user->setPassword($password, $password);
+        $user->registerPassword($password);
         $this->assertNotNull($user->passwordDigest);
     }
 
     /**
-     * @expectedException ToyToyToy\Exception\InvalidPasswordException
+     * @expectedException \InvalidArgumentException
      */
-    public function testSetPassword__when_password_is_empty()
+    public function testRegisterPassword__when_password_is_empty()
     {
         $password = '';
-        $this->user->setPassword($password, $password);
+        $this->user->registerPassword($password);
     }
 
     /**
-     * @expectedException ToyToyToy\Exception\InvalidPasswordException
+     * @expectedException \InvalidArgumentException
      */
-    public function testSetPassword__when_password_length_over_allowed_max()
+    public function testRegisterPassword__when_password_length_over_allowed_max()
     {
         $password = '0123456789012345678901234567890123456789012345678901234567890123456789123';
-        $this->user->setPassword($password, $password);
-    }
-
-    /**
-     * @expectedException ToyToyToy\Exception\InvalidPasswordException
-     */
-    public function testSetPassword__when_passwordConfirmation_is_not_match()
-    {
-        $this->user->setPassword('test', 'test+');
+        $this->user->registerPassword($password);
     }
 }

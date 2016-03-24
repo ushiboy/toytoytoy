@@ -1,6 +1,8 @@
 <?php
 namespace ToyToyToy;
 
+use ToyToyToy\Model\User;
+
 class Dependency
 {
     public static function apply(\Slim\Container $container)
@@ -15,6 +17,12 @@ class Dependency
 
         $container['csrf'] = function ($c) {
             return new \Slim\Csrf\Guard();
+        };
+
+        $container['auth'] = function ($c) {
+            return new \SlimAuth\Auth(function ($id) {
+                return User::find($id);
+            });
         };
 
         $capsule = new \Illuminate\Database\Capsule\Manager();

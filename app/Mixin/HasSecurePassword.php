@@ -1,7 +1,7 @@
 <?php
 namespace ToyToyToy\Mixin;
 
-use ToyToyToy\Exception\InvalidPasswordException;
+use \InvalidArgumentException;
 
 trait HasSecurePassword
 {
@@ -13,28 +13,26 @@ trait HasSecurePassword
         return password_verify($unencryptedPassword, $this->getPasswordDigest());
     }
 
-    public function setPassword($password, $passwordConfirmation)
+    public function registerPassword($unencryptedPassword, $algo = PASSWORD_BCRYPT, $cost = 10)
     {
-        $this->validatePassword($password, $passwordConfirmation);
-        $passwordDigest = $this->createPasswordDigest($password);
+        $this->validatePassword($unencryptedPassword);
+        $passwordDigest = $this->createPasswordDigest($unencryptedPassword, $algo, $cost);
         $this->applyPasswordDigest($passwordDigest);
     }
 
-    protected function createPasswordDigest($unencryptedPassword)
+    protected function createPasswordDigest($unencryptedPassword, $algo, $cost)
     {
-        return password_hash($unencryptedPassword, PASSWORD_BCRYPT, [
-            'cost' => 10
+        return password_hash($unencryptedPassword, $algo, [
+            'cost' => $cost
         ]);
     }
 
-    protected function validatePassword($password, $passwordConfirmation)
+    protected function validatePassword($password)
     {
         if (empty($password)) {
-            throw new InvalidPasswordException('password required');
+            throw new InvalidArgumentException('password required');
         } elseif (strlen($password) > self::$maxPasswordLengthAllowed) {
-            throw new InvalidPasswordException('invalid password maximum length');
-        } elseif ($password !== $passwordConfirmation) {
-            throw new InvalidPasswordException('confirumation is not match');
+            throw new InvalidArgumentException('invalid password maximum length');
         }
     }
 
