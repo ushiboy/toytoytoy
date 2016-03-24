@@ -11,7 +11,6 @@ class Users extends Base
         $params = $request->getParsedBody();
 
         $user = new User($params);
-        $user->registerPassword($params['password'], $params['password_confirmation']);
         $user->save();
 
         $this->auth->permit($user->id);

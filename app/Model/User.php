@@ -10,6 +10,18 @@ class User extends Eloquent\Model
 {
     use HasSecurePassword;
 
+    public $password;
+
+    public $passwordConfirmation;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->password = $attributes['password'] ?? null;
+        $this->passwordConfirmation = $attributes['password_confirmation'] ?? null;
+    }
+
+
     protected $fillable = ['name', 'email'];
 
     protected function applyPasswordDigest($passwordDigest)
@@ -35,6 +47,7 @@ class User extends Eloquent\Model
     public function save(array $options = [])
     {
         $this->validate();
+        $this->registerPassword($this->password);
         return parent::save($options);
     }
 

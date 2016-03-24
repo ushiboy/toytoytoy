@@ -41,7 +41,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user = $this->user;
         $user->name = 'test';
         $user->email = 'test@example.com';
-        $user->registerPassword('test1234', 'test1234');
+        $user->password = 'test1234';
+        $user->passwordConfirmation = 'test1234';
         $user->save();
 
         $id = $user->id;
@@ -55,9 +56,10 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $user1 = new User([
             'name' => 'test1',
-            'email' => 'test1@example.com'
+            'email' => 'test1@example.com',
+            'password' => 'test1',
+            'password_confirmation' => 'test1'
         ]);
-        $user1->registerPassword('test1', 'test1');
         $user1->save();
 
         $sameUser = User::findByEmail('test1@example.com');
@@ -69,9 +71,10 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $user1 = new User([
             'name' => 'test1',
-            'email' => 'test1@example.com'
+            'email' => 'test1@example.com',
+            'password' => 'test1',
+            'password_confirmation' => 'test1'
         ]);
-        $user1->registerPassword('test1', 'test1');
         $user1->save();
 
         $sameUser = User::findByEmail('none@example.com');
