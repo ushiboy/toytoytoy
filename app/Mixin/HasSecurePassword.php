@@ -13,7 +13,10 @@ trait HasSecurePassword
         return password_verify($unencryptedPassword, $this->getPasswordDigest());
     }
 
-    public function setPassword($password, $passwordConfirmation)
+    // register_
+    // password
+    //
+    public function registerPassword($password, $passwordConfirmation)
     {
         $this->validatePassword($password, $passwordConfirmation);
         $passwordDigest = $this->createPasswordDigest($password);
