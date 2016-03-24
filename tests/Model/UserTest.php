@@ -57,8 +57,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user1 = new User([
             'name' => 'test1',
             'email' => 'test1@example.com',
-            'password' => 'test1',
-            'password_confirmation' => 'test1'
+            'password' => 'test1234',
+            'password_confirmation' => 'test1234'
         ]);
         $user1->save();
 
@@ -72,8 +72,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user1 = new User([
             'name' => 'test1',
             'email' => 'test1@example.com',
-            'password' => 'test1',
-            'password_confirmation' => 'test1'
+            'password' => 'test1234',
+            'password_confirmation' => 'test1234'
         ]);
         $user1->save();
 
