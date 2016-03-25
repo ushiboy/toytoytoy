@@ -48,6 +48,22 @@ class User extends Eloquent\Model
         return self::where('email', '=', $email)->get()->first();
     }
 
+    public static function findByRememberToken($rememberToken)
+    {
+        return self::where('remember_token', '=', $rememberToken)->get()->first();
+    }
+
+    public static function newRememberToken($length = 16)
+    {
+        return str_replace(['+', '/', '='], ['-','_', ''],
+            base64_encode(openssl_random_pseudo_bytes($length)));
+    }
+
+    public static function encrypt($token)
+    {
+        return sha1($token);
+    }
+
     protected function applyPasswordDigest($passwordDigest)
     {
         $this->password_digest = $passwordDigest;
