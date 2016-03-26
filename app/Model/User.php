@@ -52,16 +52,21 @@ class User extends Eloquent\Model
 
     public static function findByEmail($email)
     {
-        $user = self::where('email', '=', $email)->get()->first();
-        if ($user !== null) {
-            $user->password = $user->passwordConfirmation = self::NO_UPDATE_PASSWORD;
-        }
-        return $user;
+        return self::fillNoUpdatePassword(self::where('email', '=', $email)->get()->first());
     }
 
     public static function findByRememberToken($rememberToken)
     {
-        return self::where('remember_token', '=', $rememberToken)->get()->first();
+        return self::fillNoUpdatePassword(
+            self::where('remember_token', '=', self::encrypt($rememberToken))->get()->first());
+    }
+
+    private static function fillNoUpdatePassword($user)
+    {
+        if ($user !== null) {
+            $user->password = $user->passwordConfirmation = self::NO_UPDATE_PASSWORD;
+        }
+        return $user;
     }
 
     public static function generateRememberToken($length = 16)
