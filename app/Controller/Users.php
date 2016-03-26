@@ -26,9 +26,6 @@ class Users extends Base
             if (($parsedBody['remember_me'] ?? 'off') === 'on') {
                 $rememberToken = User::generateRememberToken();
                 $this->cookie->set('remember_token', $rememberToken);
-                // FIXME
-                $user->password = $parsedBody['password'];
-                $user->passwordConfirmation = $parsedBody['password'];
                 $user->remember_token = User::encrypt($rememberToken);
                 $user->save();
                 $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());

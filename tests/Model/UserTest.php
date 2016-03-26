@@ -36,6 +36,27 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->user = new User();
     }
 
+    /**
+     * @expectedException \Respect\Validation\Exceptions\AllOfException
+     */
+    public function testVaildate__when_invalid_password()
+    {
+        $user = $this->user;
+        $user->name = 'test';
+        $user->email = 'test@example.com';
+        $user->password = null;
+        $user->validate();
+    }
+
+    public function testVaildate__when_no_update_password()
+    {
+        $user = $this->user;
+        $user->name = 'test';
+        $user->email = 'test@example.com';
+        $user->password = User::NO_UPDATE_PASSWORD;
+        $user->validate();
+    }
+
     public function testRegisterPassword()
     {
         $user = $this->user;
@@ -65,6 +86,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $sameUser = User::findByEmail('test1@example.com');
         $this->assertEquals($sameUser->name, 'test1');
         $this->assertEquals($sameUser->email, 'test1@example.com');
+        $this->assertEquals($sameUser->password, User::NO_UPDATE_PASSWORD);
+        $this->assertEquals($sameUser->passwordConfirmation, User::NO_UPDATE_PASSWORD);
     }
 
     public function testFindByEmail__when_not_found()
