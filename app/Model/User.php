@@ -53,7 +53,7 @@ class User extends Eloquent\Model
         return self::where('remember_token', '=', $rememberToken)->get()->first();
     }
 
-    public static function newRememberToken($length = 16)
+    public static function generateRememberToken($length = 16)
     {
         return str_replace(['+', '/', '='], ['-','_', ''],
             base64_encode(openssl_random_pseudo_bytes($length)));

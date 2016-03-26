@@ -25,6 +25,11 @@ class Dependency
             });
         };
 
+        $container['cookie'] = function ($c) {
+            $request = $c->get('request');
+            return new \Slim\Http\Cookies($request->getCookieParams());
+        };
+
         $capsule = new \Illuminate\Database\Capsule\Manager();
         $capsule->addConnection($container->get('settings')['db']);
         $capsule->setAsGlobal();

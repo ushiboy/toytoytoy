@@ -23,6 +23,16 @@ class Users extends Base
         $user = User::findByEmail($parsedBody['email']);
         if ($user && $user->authenticate($parsedBody['password'])) {
             $this->auth->permit($user->id);
+            if (($parsedBody['remember_me'] ?? 'off') === 'on') {
+                $rememberToken = User::generateRememberToken();
+                $this->cookie->set('remember_token', $rememberToken);
+                // FIXME
+                $user->password = $parsedBody['password'];
+                $user->passwordConfirmation = $parsedBody['password'];
+                $user->remember_token = User::encrypt($rememberToken);
+                $user->save();
+                $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());
+            }
         }
         return $response->withRedirect('/', 301);
     }
