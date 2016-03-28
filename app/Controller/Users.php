@@ -26,8 +26,7 @@ class Users extends Base
             if (($parsedBody['remember_me'] ?? 'off') === 'on') {
                 $rememberToken = User::generateRememberToken();
                 $this->cookie->set('remember_token', $rememberToken);
-                $user->remember_token = User::encrypt($rememberToken);
-                $user->save();
+                $user->updateRememberToken($rememberToken);
                 $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());
             }
         }
@@ -36,7 +35,10 @@ class Users extends Base
 
     public function signout($request, $response)
     {
+        $this->auth->getAuthenticated()->clearRememberToken();
         $this->auth->clear();
+        $this->cookie->set('remember_token', '');
+        $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());
         return $response->withRedirect('/', 301);
     }
 }

@@ -50,6 +50,23 @@ class User extends Eloquent\Model
         return parent::save($options);
     }
 
+    public function updateRememberToken($rememberToken)
+    {
+        $this->remember_token = self::encrypt($rememberToken);
+        $this->save();
+    }
+
+    public function clearRememberToken()
+    {
+        $this->remember_token = null;
+        $this->save();
+    }
+
+    public static function findAndFill($id)
+    {
+        return self::fillNoUpdatePassword(self::find($id));
+    }
+
     public static function findByEmail($email)
     {
         return self::fillNoUpdatePassword(self::where('email', '=', $email)->get()->first());
@@ -61,7 +78,7 @@ class User extends Eloquent\Model
             self::where('remember_token', '=', self::encrypt($rememberToken))->get()->first());
     }
 
-    private static function fillNoUpdatePassword($user)
+    public static function fillNoUpdatePassword($user)
     {
         if ($user !== null) {
             $user->password = $user->passwordConfirmation = self::NO_UPDATE_PASSWORD;
