@@ -62,23 +62,23 @@ class User extends Eloquent\Model
         $this->save();
     }
 
-    public static function findAndFill($id)
+    public static function findById($id)
     {
-        return self::fillNoUpdatePassword(self::find($id));
+        return self::fillPasswordWithNoUpdate(self::find($id));
     }
 
     public static function findByEmail($email)
     {
-        return self::fillNoUpdatePassword(self::where('email', '=', $email)->get()->first());
+        return self::fillPasswordWithNoUpdate(self::where('email', '=', $email)->get()->first());
     }
 
     public static function findByRememberToken($rememberToken)
     {
-        return self::fillNoUpdatePassword(
-            self::where('remember_token', '=', self::encrypt($rememberToken))->get()->first());
+        $encryptedToken = self::encrypt($rememberToken);
+        return self::fillPasswordWithNoUpdate(self::where('remember_token', '=', $encryptedToken)->get()->first());
     }
 
-    public static function fillNoUpdatePassword($user)
+    public static function fillPasswordWithNoUpdate($user)
     {
         if ($user !== null) {
             $user->password = $user->passwordConfirmation = self::NO_UPDATE_PASSWORD;
@@ -88,8 +88,8 @@ class User extends Eloquent\Model
 
     public static function generateRememberToken($length = 16)
     {
-        return str_replace(['+', '/', '='], ['-','_', ''],
-            base64_encode(openssl_random_pseudo_bytes($length)));
+        $randomToken = openssl_random_pseudo_bytes($length);
+        return str_replace(['+', '/', '='], ['-','_', ''], base64_encode($randomToken));
     }
 
     public static function encrypt($token)

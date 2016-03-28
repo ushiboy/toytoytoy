@@ -22,7 +22,7 @@ class Dependency
         $container['auth'] = function ($c) {
             return new \SlimAuth\Auth(function ($id, $request) use ($c) {
                 if ($id !== null) {
-                    return User::findAndFill($id);
+                    return User::findById($id);
                 }
                 $rememberToken = $c->get('cookie')->get('remember_token');
                 if ($rememberToken !== null) {
