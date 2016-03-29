@@ -2,6 +2,7 @@
 namespace ToyToyToy\Controller;
 
 use ToyToyToy\Model\User;
+use Respect\Validation\Exceptions\AllOfException;
 
 class Users extends Base
 {
@@ -9,12 +10,15 @@ class Users extends Base
     public function create($request, $response)
     {
         $params = $request->getParsedBody();
-
         $user = new User($params);
-        $user->save();
-
-        $this->auth->permit($user->id);
-        return $response->withRedirect('/', 301);
+        try {
+            $user->save();
+            $this->auth->permit($user->id);
+            return $response->withRedirect('/', 301);
+        } catch (AllOfException $e) {
+            $this->flash->addMessage('error', $e->getMessage());
+            return $response->withRedirect('/signup', 301);
+        }
     }
 
     public function signin($request, $response)

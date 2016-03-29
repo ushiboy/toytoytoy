@@ -19,6 +19,10 @@ class Dependency
             return new \Slim\Csrf\Guard();
         };
 
+        $container['flash'] = function () {
+            return new \Slim\Flash\Messages();
+        };
+
         $container['auth'] = function ($c) {
             return new \SlimAuth\Auth(function ($id, $request) use ($c) {
                 if ($id !== null) {
