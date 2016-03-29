@@ -53,38 +53,33 @@ class User extends Eloquent\Model
     public function updateRememberToken($rememberToken)
     {
         $this->remember_token = self::encrypt($rememberToken);
+        $this->setNoUpdatePassowrd();
         $this->save();
     }
 
     public function clearRememberToken()
     {
         $this->remember_token = null;
+        $this->setNoUpdatePassowrd();
         $this->save();
     }
 
-    public static function findById($id)
+    public function setNoUpdatePassowrd()
     {
-        return self::fillPasswordWithNoUpdate(self::find($id));
+        $this->password = $this->passwordConfirmation = self::NO_UPDATE_PASSWORD;
     }
 
     public static function findByEmail($email)
     {
-        return self::fillPasswordWithNoUpdate(self::where('email', '=', $email)->get()->first());
+        return self::where('email', '=', $email)->get()->first();
     }
 
     public static function findByRememberToken($rememberToken)
     {
         $encryptedToken = self::encrypt($rememberToken);
-        return self::fillPasswordWithNoUpdate(self::where('remember_token', '=', $encryptedToken)->get()->first());
+        return self::where('remember_token', '=', $encryptedToken)->get()->first();
     }
 
-    public static function fillPasswordWithNoUpdate($user)
-    {
-        if ($user !== null) {
-            $user->password = $user->passwordConfirmation = self::NO_UPDATE_PASSWORD;
-        }
-        return $user;
-    }
 
     public static function generateRememberToken($length = 16)
     {

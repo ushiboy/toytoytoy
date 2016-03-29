@@ -60,22 +60,11 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($sameUser->password_digest);
     }
 
-    public function testFind()
-    {
-        $sameUser = User::findById($this->existedUser->id);
-        $this->assertEquals($sameUser->name, 'test1');
-        $this->assertEquals($sameUser->email, 'test1@example.com');
-        $this->assertEquals($sameUser->password, User::NO_UPDATE_PASSWORD);
-        $this->assertEquals($sameUser->passwordConfirmation, User::NO_UPDATE_PASSWORD);
-    }
-
     public function testFindByEmail()
     {
         $sameUser = User::findByEmail('test1@example.com');
         $this->assertEquals($sameUser->name, 'test1');
         $this->assertEquals($sameUser->email, 'test1@example.com');
-        $this->assertEquals($sameUser->password, User::NO_UPDATE_PASSWORD);
-        $this->assertEquals($sameUser->passwordConfirmation, User::NO_UPDATE_PASSWORD);
     }
 
     public function testFindByEmail__when_not_found()
@@ -84,13 +73,13 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sameUser);
     }
 
-    public function testFillPasswordWithNoUpdate()
+    public function testSetNoUpdatePassword()
     {
         $sameUser = User::find($this->existedUser->id);
         $this->assertNull($sameUser->password);
         $this->assertNull($sameUser->passwordConfirmation);
 
-        $filledUser = User::fillPasswordWithNoUpdate($sameUser);
+        $sameUser->setNoUpdatePassowrd();
         $this->assertEquals($sameUser->password, User::NO_UPDATE_PASSWORD);
         $this->assertEquals($sameUser->passwordConfirmation, User::NO_UPDATE_PASSWORD);
     }
