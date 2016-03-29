@@ -2,43 +2,51 @@
 namespace ToyToyToy\Tests\Model;
 
 use ToyToyToy\Model\User;
-use ToyToyToy\Exception\InvalidPasswordException;
-
-use Phinx\Migration\Manager;
-use Phinx\Config\Config;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Illuminate\Database\Connection;
 
 class UserTest extends \PHPUnit_Framework_TestCase
 {
 
-    private $user;
+    use \ToyToyToy\Tests\Helper\Database;
+
+    private $existedUser;
 
     public function setUp()
     {
-        $config = Config::fromYaml(__DIR__."/../../phinx.yml");
-        $manager = new Manager($config, new NullOutput());
-        $manager->migrate('testing');
-        $conn = $manager->getEnvironment('testing')->getAdapter()->getConnection();
-        $capsule = new \Illuminate\Database\Capsule\Manager();
-        $dbManager = $capsule->getDatabaseManager();
-        $dbManager->extend('default', function($config, $name) use($conn) {
-            return new Connection($conn);
-        });
-        $capsule->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:'
-        ]);
-        $capsule->setAsGlobal();
-        $capsule->bootEloquent();
+        $this->setUpDataBase(__DIR__."/../../phinx.yml");
 
-        $this->user = new User();
+        $this->existedUser = new User([
+            'name' => 'test1',
+            'email' => 'test1@example.com',
+            'password' => 'test1234',
+            'password_confirmation' => 'test1234'
+        ]);
+        $this->existedUser->save();
+    }
+
+    /**
+     * @expectedException \Respect\Validation\Exceptions\AllOfException
+     */
+    public function testVaildate__when_invalid_password()
+    {
+        $user = new User();
+        $user->name = 'test';
+        $user->email = 'test@example.com';
+        $user->password = null;
+        $user->validate();
+    }
+
+    public function testVaildate__when_no_update_password()
+    {
+        $user = new User();
+        $user->name = 'test';
+        $user->email = 'test@example.com';
+        $user->password = User::NO_UPDATE_PASSWORD;
+        $user->validate();
     }
 
     public function testRegisterPassword()
     {
-        $user = $this->user;
+        $user = new User();
         $user->name = 'test';
         $user->email = 'test@example.com';
         $user->password = 'test1234';
@@ -54,14 +62,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testFindByEmail()
     {
-        $user1 = new User([
-            'name' => 'test1',
-            'email' => 'test1@example.com',
-            'password' => 'test1234',
-            'password_confirmation' => 'test1234'
-        ]);
-        $user1->save();
-
         $sameUser = User::findByEmail('test1@example.com');
         $this->assertEquals($sameUser->name, 'test1');
         $this->assertEquals($sameUser->email, 'test1@example.com');
@@ -69,15 +69,18 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testFindByEmail__when_not_found()
     {
-        $user1 = new User([
-            'name' => 'test1',
-            'email' => 'test1@example.com',
-            'password' => 'test1234',
-            'password_confirmation' => 'test1234'
-        ]);
-        $user1->save();
-
         $sameUser = User::findByEmail('none@example.com');
         $this->assertNull($sameUser);
+    }
+
+    public function testSetNoUpdatePassword()
+    {
+        $sameUser = User::find($this->existedUser->id);
+        $this->assertNull($sameUser->password);
+        $this->assertNull($sameUser->passwordConfirmation);
+
+        $sameUser->setNoUpdatePassowrd();
+        $this->assertEquals($sameUser->password, User::NO_UPDATE_PASSWORD);
+        $this->assertEquals($sameUser->passwordConfirmation, User::NO_UPDATE_PASSWORD);
     }
 }

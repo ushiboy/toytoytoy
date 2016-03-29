@@ -16,6 +16,7 @@
     "phinx": "phinx",
     "phpcs": "phpcs --standard=PSR2 app",
     "test": "phpunit",
+    "phpunit": "phpunit",
     "serve": "php -S localhost:1234 -t public"
   },
   "autoload": {

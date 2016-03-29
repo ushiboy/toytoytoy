@@ -20,9 +20,21 @@ class Dependency
         };
 
         $container['auth'] = function ($c) {
-            return new \SlimAuth\Auth(function ($id) {
-                return User::find($id);
+            return new \SlimAuth\Auth(function ($id, $request) use ($c) {
+                if ($id !== null) {
+                    return User::find($id);
+                }
+                $rememberToken = $c->get('cookie')->get('remember_token');
+                if ($rememberToken !== null) {
+                    return User::findByRememberToken($rememberToken);
+                }
+                return null;
             });
+        };
+
+        $container['cookie'] = function ($c) {
+            $request = $c->get('request');
+            return new \Slim\Http\Cookies($request->getCookieParams());
         };
 
         $capsule = new \Illuminate\Database\Capsule\Manager();
