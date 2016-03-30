@@ -33,6 +33,8 @@ class Users extends Base
                 $user->updateRememberToken($rememberToken);
                 $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());
             }
+        } else {
+            $this->flash->addMessage('error', 'Invalid email/password combination');
         }
         return $response->withRedirect('/', 301);
     }

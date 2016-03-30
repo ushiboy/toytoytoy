@@ -20,7 +20,8 @@ class Main extends Base
             'csrfName' => $name,
             'nameKey' => $nameKey,
             'valueKey' => $valueKey,
-            'value' => $value
+            'value' => $value,
+            'errors' => $this->flash->getMessage('error')
         ]);
     }
 
@@ -30,7 +31,6 @@ class Main extends Base
         $valueKey = $this->csrf->getTokenValueKey();
         $name = $request->getAttribute($nameKey);
         $value = $request->getAttribute($valueKey);
-        // var_dump($this->flash->getMessage('error'));
         return $this->view->render($response, 'signup.html', [
             'csrfName' => $name,
             'nameKey' => $nameKey,
