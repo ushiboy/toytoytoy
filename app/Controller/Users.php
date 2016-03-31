@@ -12,6 +12,7 @@ class Users extends Base
         $user = new User($params);
         try {
             $user->save();
+            $this->logger->addInfo('created new user');
             $this->auth->permit($user->id);
             return $response->withRedirect('/', 301);
         } catch (\Exception $e) {

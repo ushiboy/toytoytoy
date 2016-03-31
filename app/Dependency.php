@@ -2,6 +2,8 @@
 namespace ToyToyToy;
 
 use ToyToyToy\Model\User;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 class Dependency
 {
@@ -21,6 +23,13 @@ class Dependency
 
         $container['flash'] = function () {
             return new \Slim\Flash\Messages();
+        };
+
+        $container['logger'] = function ($c) {
+            $settings = $c->get('settings')['logger'];
+            $logger = new Logger($settings['name']);
+            $logger->pushHandler(new StreamHandler($settings['log_path'], $settings['level']));
+            return $logger;
         };
 
         $container['auth'] = function ($c) {

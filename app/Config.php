@@ -1,6 +1,8 @@
 <?php
 namespace ToyToyToy;
 
+use Monolog\Logger;
+
 class Config
 {
     public static function get()
@@ -24,6 +26,11 @@ class Config
                         'debug' => true,
                         'auto_reload' => true
                     ]
+                ],
+                'logger' => [
+                    'name' => 'main',
+                    'log_path' => __DIR__.'/../log/app.log',
+                    'level' => Logger::DEBUG
                 ]
             ]
         ];
