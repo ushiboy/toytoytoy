@@ -7,7 +7,8 @@
     "illuminate/database": "^5.2",
     "respect/validation": "^1.0",
     "slim/flash": "^0.1.0",
-    "monolog/monolog": "^1.18"
+    "monolog/monolog": "^1.18",
+    "swiftmailer/swiftmailer": "^5.4"
   },
   "require-dev": {
     "robmorgan/phinx": "^0.5.3",
