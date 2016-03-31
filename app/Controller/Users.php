@@ -2,7 +2,6 @@
 namespace ToyToyToy\Controller;
 
 use ToyToyToy\Model\User;
-use Respect\Validation\Exceptions\AllOfException;
 
 class Users extends Base
 {
@@ -15,7 +14,7 @@ class Users extends Base
             $user->save();
             $this->auth->permit($user->id);
             return $response->withRedirect('/', 301);
-        } catch (AllOfException $e) {
+        } catch (\Exception $e) {
             $this->flash->addMessage('error', $e->getMessage());
             return $response->withRedirect('/signup', 301);
         }

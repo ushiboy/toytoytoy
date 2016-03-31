@@ -35,7 +35,8 @@ class Main extends Base
             'csrfName' => $name,
             'nameKey' => $nameKey,
             'valueKey' => $valueKey,
-            'value' => $value
+            'value' => $value,
+            'errors' => $this->flash->getMessage('error')
         ]);
     }
 }
