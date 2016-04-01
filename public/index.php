@@ -14,8 +14,6 @@ try {
     \ToyToyToy\Dependency::apply($app->getContainer());
     \ToyToyToy\Route::registration($app);
     $app->run();
-} catch (Error $e) {
-    var_dump($e);
-} catch (ErrorException $e) {
+} catch (Throwable $e) {
     var_dump($e);
 }
