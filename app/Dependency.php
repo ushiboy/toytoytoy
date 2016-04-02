@@ -4,11 +4,14 @@ namespace ToyToyToy;
 use ToyToyToy\Model\User;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use ToyToyToy\Exception\RequestErrorException;
 
 class Dependency
 {
-    public static function apply(\Slim\Container $container)
+    public static function apply(\Slim\App $app)
     {
+
+        $container = $app->getContainer();
         $container['view'] = function ($c) {
             $settings = $c->get('settings')['view'];
             $view = new \Slim\Views\Twig($settings['template_path'], $settings['twig']);
@@ -23,6 +26,22 @@ class Dependency
 
         $container['flash'] = function () {
             return new \Slim\Flash\Messages();
+        };
+
+        \Swift::init(function () {
+            \Swift_DependencyContainer::getInstance()
+                ->register('mime.qpheaderencoder')
+                ->asAliasOf('mime.base64headerencoder');
+            \Swift_Preferences::getInstance()->setCharset('iso-2022-jp');
+        });
+
+        $container['mail'] = function($c) {
+            $settings = $c->get('settings')['mail'];
+            $transport = \Swift_SmtpTransport::newInstance($settings['host'], $settings['port'])
+                ->setUsername($settings['user'])
+                ->setPassword($settings['password'])
+                ->setEncryption($settings['encryption']);
+            return \Swift_Mailer::newInstance($transport);
         };
 
         $container['logger'] = function ($c) {
@@ -54,5 +73,18 @@ class Dependency
         $capsule->addConnection($container->get('settings')['db']);
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
+
+        $app->add(function($request, $response, $next) use($capsule) {
+            $connection = $capsule->getConnection();
+            $connection->beginTransaction();
+            try {
+                $response = $next($request, $response);
+                $connection->commit();
+                return $response;
+            } catch (RequestErrorException $e) {
+                $connection->rollBack();
+                return $e->getResponse();
+            }
+        });
     }
 }

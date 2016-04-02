@@ -2,6 +2,7 @@
 namespace ToyToyToy\Controller;
 
 use ToyToyToy\Model\User;
+use ToyToyToy\Exception\RequestErrorException;
 
 class Users extends Base
 {
@@ -13,11 +14,23 @@ class Users extends Base
         try {
             $user->save();
             $this->logger->addInfo('created new user');
+
+            $message = \Swift_Message::newInstance()
+                ->setCharset('iso-2022-jp')
+                ->setEncoder(\Swift_Encoding::get7BitEncoding())
+                ->setSubject('test')
+                ->setFrom($user->email)
+                ->setTo($user->email)
+                ->setBody('testtesttest');
+
+            $result = $this->mail->send($message);
+            $this->logger->addInfo('sendmail result ' + $result);
+
             $this->auth->permit($user->id);
             return $response->withRedirect('/', 301);
         } catch (\Exception $e) {
             $this->flash->addMessage('error', $e->getMessage());
-            return $response->withRedirect('/signup', 301);
+            throw new RequestErrorException($response->withRedirect('/signup', 301), $e);
         }
     }
 
