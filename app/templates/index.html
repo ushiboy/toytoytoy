@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Test</title>
-<link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
-</head>
-<body>
+{% extends "layouts/index.html" %}
+
+{% block body %}
 <div class="container">
   <h1>Login</h1>
   {% if errors %}
@@ -33,5 +28,4 @@
     <a href="./signup">Sign Up</a>
   </form>
 </div>
-</body>
-</html>
+{% endblock %}
