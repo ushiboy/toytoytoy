@@ -39,11 +39,13 @@ class Config
                     'level' => Logger::DEBUG
                 ],
                 'mail' => [
-                    'host' => 'smtp.gmail.com',
-                    'port' => 465,
+                    'host' => getenv('SMTP_HOST'),
+                    'port' => getenv('SMTP_PORT'),
                     'user' => getenv('SMTP_USER'),
                     'password' => getenv('SMTP_PASSWORD'),
-                    'encryption' => 'ssl'
+                    'encryption' => getenv('SMTP_ENCRYOTION'),
+                    'from_address' => getenv('SMTP_FROM_ADDRESS'),
+                    'from_name' => getenv('SMTP_FROM_NAME')
                 ]
             ]
         ];
