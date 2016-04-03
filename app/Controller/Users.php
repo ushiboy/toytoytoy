@@ -7,6 +7,21 @@ use ToyToyToy\Exception\RequestErrorException;
 class Users extends Base
 {
 
+    public function new($request, $response)
+    {
+        $nameKey = $this->csrf->getTokenNameKey();
+        $valueKey = $this->csrf->getTokenValueKey();
+        $name = $request->getAttribute($nameKey);
+        $value = $request->getAttribute($valueKey);
+        return $this->view->render($response, 'signup.html', [
+            'csrfName' => $name,
+            'nameKey' => $nameKey,
+            'valueKey' => $valueKey,
+            'value' => $value,
+            'errors' => $this->flash->getMessage('error')
+        ]);
+    }
+
     public function create($request, $response)
     {
         $params = $request->getParsedBody();
@@ -34,30 +49,4 @@ class Users extends Base
         }
     }
 
-    public function signin($request, $response)
-    {
-        $parsedBody = $request->getParsedBody();
-        $user = User::findByEmail($parsedBody['email']);
-        if ($user && $user->authenticate($parsedBody['password'])) {
-            $this->auth->permit($user->id);
-            if (($parsedBody['remember_me'] ?? 'off') === 'on') {
-                $rememberToken = User::generateRememberToken();
-                $this->cookie->set('remember_token', $rememberToken);
-                $user->updateRememberToken($rememberToken);
-                $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());
-            }
-        } else {
-            $this->flash->addMessage('error', 'Invalid email/password combination');
-        }
-        return $response->withRedirect('/', 301);
-    }
-
-    public function signout($request, $response)
-    {
-        $this->auth->getAuthenticated()->clearRememberToken();
-        $this->auth->clear();
-        $this->cookie->set('remember_token', '');
-        $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());
-        return $response->withRedirect('/', 301);
-    }
 }
