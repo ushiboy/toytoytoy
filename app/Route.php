@@ -10,6 +10,7 @@ class Route
         $app->get('/', '\ToyToyToy\Controller\Main:index');
         $app->get('/signup', '\ToyToyToy\Controller\Users:new');
         $app->post('/signup', '\ToyToyToy\Controller\Users:create');
+        $app->get('/profile', '\ToyToyToy\Controller\Users:show');
         $app->post('/signin', '\ToyToyToy\Controller\Sessions:create');
         $app->get('/signout', '\ToyToyToy\Controller\Sessions:destroy');
         $app->add($app->getContainer()->get('csrf'));

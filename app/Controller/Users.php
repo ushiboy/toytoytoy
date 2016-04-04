@@ -49,4 +49,21 @@ class Users extends Base
         }
     }
 
+    public function show($request, $response)
+    {
+        $nameKey = $this->csrf->getTokenNameKey();
+        $valueKey = $this->csrf->getTokenValueKey();
+        $name = $request->getAttribute($nameKey);
+        $value = $request->getAttribute($valueKey);
+        $profile = $this->auth->getAuthenticated();
+        return $this->view->render($response, 'index_signed.html', [
+            'csrfName' => $name,
+            'nameKey' => $nameKey,
+            'valueKey' => $valueKey,
+            'value' => $value,
+            'errors' => $this->flash->getMessage('error'),
+            'profile' => $profile
+        ]);
+    }
+
 }

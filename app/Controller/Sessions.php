@@ -18,7 +18,7 @@ class Sessions extends Base
                 $user->updateRememberToken($rememberToken);
                 $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());
             }
-            return $response->withRedirect('/', 301);
+            return $response->withRedirect('/profile', 301);
         } else {
             $this->flash->addMessage('error', 'Invalid email/password combination');
             return $response->withRedirect('/', 301);
