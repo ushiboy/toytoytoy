@@ -6,12 +6,6 @@ class Main extends Base
 
     public function index($request, $response)
     {
-
-        if ($this->auth->getAuthenticated()) {
-            return $this->view->render($response, 'index_signed.html', [
-            ]);
-        }
-
         $nameKey = $this->csrf->getTokenNameKey();
         $valueKey = $this->csrf->getTokenValueKey();
         $name = $request->getAttribute($nameKey);

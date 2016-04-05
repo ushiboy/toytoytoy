@@ -40,11 +40,11 @@
     </div>
     <div class="form-group">
       <label for="password">Password</label>
-      <input type="password" class="form-control" id="password" name="password" />
+      <input type="password" class="form-control" id="password" name="password" value={{profile.password}} />
     </div>
     <div class="form-group">
       <label for="password_confirmation">Confirm Password</label>
-      <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" />
+      <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" value={{profile.passwordConfirmation}} />
     </div>
     <input type="hidden" name="{{nameKey}}" value="{{csrfName}}" />
     <input type="hidden" name="{{valueKey}}" value="{{value}}" />

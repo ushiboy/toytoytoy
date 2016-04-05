@@ -42,7 +42,7 @@ class Users extends Base
             $this->logger->addInfo('sendmail result ' + $result);
 
             $this->auth->permit($user->id);
-            return $response->withRedirect('/', 301);
+            return $response->withRedirect('/profile', 301);
         } catch (\Exception $e) {
             $this->flash->addMessage('error', $e->getMessage());
             throw new RequestErrorException($response->withRedirect('/signup', 301), $e);
@@ -56,6 +56,7 @@ class Users extends Base
         $name = $request->getAttribute($nameKey);
         $value = $request->getAttribute($valueKey);
         $profile = $this->auth->getAuthenticated();
+        $profile->setNoUpdatePassowrd();
         return $this->view->render($response, 'index_signed.html', [
             'csrfName' => $name,
             'nameKey' => $nameKey,
@@ -66,4 +67,16 @@ class Users extends Base
         ]);
     }
 
+    public function update($request, $response)
+    {
+        $params = $request->getParsedBody();
+        $user = $this->auth->getAuthenticated();
+        try {
+            $user->save();
+            $this->logger->addInfo('update user');
+        } catch (\Exception $e) {
+            $this->flash->addMessage('error', $e->getMessage());
+        }
+        return $response->withRedirect('/profile', 301);
+    }
 }
