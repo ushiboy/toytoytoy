@@ -72,7 +72,7 @@ class Users extends Base
         $params = $request->getParsedBody();
         $user = $this->auth->getAuthenticated();
         try {
-            $user->save();
+            $user->update($params);
             $this->logger->addInfo('update user');
         } catch (\Exception $e) {
             $this->flash->addMessage('error', $e->getMessage());

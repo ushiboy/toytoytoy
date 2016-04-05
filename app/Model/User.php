@@ -41,6 +41,13 @@ class User extends Eloquent\Model
         $userValidator->assert($obj);
     }
 
+    public function fill(array $attributes)
+    {
+        $this->password = $attributes['password'] ?? null;
+        $this->passwordConfirmation = $attributes['password_confirmation'] ?? null;
+        return parent::fill($attributes);
+    }
+
     public function save(array $options = [])
     {
         $this->validate();
