@@ -13,7 +13,7 @@ class Users extends Base
         $valueKey = $this->csrf->getTokenValueKey();
         $name = $request->getAttribute($nameKey);
         $value = $request->getAttribute($valueKey);
-        return $this->view->render($response, 'signup.html', [
+        return $this->view->render($response, 'profile/signup.html', [
             'csrfName' => $name,
             'nameKey' => $nameKey,
             'valueKey' => $valueKey,
@@ -57,7 +57,7 @@ class Users extends Base
         $value = $request->getAttribute($valueKey);
         $profile = $this->auth->getAuthenticated();
         $profile->setNoUpdatePassowrd();
-        return $this->view->render($response, 'index_signed.html', [
+        return $this->view->render($response, 'profile/edit.html', [
             'csrfName' => $name,
             'nameKey' => $nameKey,
             'valueKey' => $valueKey,
