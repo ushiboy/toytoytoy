@@ -5,7 +5,11 @@
     "slim/twig-view": "^2.1",
     "slim/csrf": "^0.6.0",
     "illuminate/database": "^5.2",
-    "respect/validation": "^1.0"
+    "respect/validation": "^1.0",
+    "slim/flash": "^0.1.0",
+    "monolog/monolog": "^1.18",
+    "swiftmailer/swiftmailer": "^5.4",
+    "vlucas/phpdotenv": "^2.2"
   },
   "require-dev": {
     "robmorgan/phinx": "^0.5.3",

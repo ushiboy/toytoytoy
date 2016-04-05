@@ -11,11 +11,9 @@ session_start();
 require '../vendor/autoload.php';
 try {
     $app = new \Slim\App(\ToyToyToy\Config::get());
-    \ToyToyToy\Dependency::apply($app->getContainer());
+    \ToyToyToy\Dependency::apply($app);
     \ToyToyToy\Route::registration($app);
     $app->run();
-} catch (Error $e) {
-    var_dump($e);
-} catch (ErrorException $e) {
+} catch (Throwable $e) {
     var_dump($e);
 }

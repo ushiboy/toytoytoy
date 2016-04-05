@@ -1,6 +1,8 @@
 db/*.sqlite
 cache
+log/*.log
 .php-version
+.env
 ### https://raw.github.com/github/gitignore/f4e1169a0dd8f0e2cbf58400576db13381976faa/Composer.gitignore
 
 composer.phar

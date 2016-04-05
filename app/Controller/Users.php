@@ -2,43 +2,81 @@
 namespace ToyToyToy\Controller;
 
 use ToyToyToy\Model\User;
+use ToyToyToy\Exception\RequestErrorException;
 
 class Users extends Base
 {
 
+    public function new($request, $response)
+    {
+        $nameKey = $this->csrf->getTokenNameKey();
+        $valueKey = $this->csrf->getTokenValueKey();
+        $name = $request->getAttribute($nameKey);
+        $value = $request->getAttribute($valueKey);
+        return $this->view->render($response, 'profile/signup.html', [
+            'csrfName' => $name,
+            'nameKey' => $nameKey,
+            'valueKey' => $valueKey,
+            'value' => $value,
+            'errors' => $this->flash->getMessage('error')
+        ]);
+    }
+
     public function create($request, $response)
     {
         $params = $request->getParsedBody();
-
         $user = new User($params);
-        $user->save();
+        try {
+            $user->save();
+            $this->logger->addInfo('created new user');
 
-        $this->auth->permit($user->id);
-        return $response->withRedirect('/', 301);
-    }
+            $message = \Swift_Message::newInstance()
+                ->setCharset('iso-2022-jp')
+                ->setEncoder(\Swift_Encoding::get7BitEncoding())
+                ->setSubject('test')
+                ->setFrom($user->email)
+                ->setTo($user->email)
+                ->setBody('testtesttest');
 
-    public function signin($request, $response)
-    {
-        $parsedBody = $request->getParsedBody();
-        $user = User::findByEmail($parsedBody['email']);
-        if ($user && $user->authenticate($parsedBody['password'])) {
+            $result = $this->mail->send($message);
+            $this->logger->addInfo('sendmail result ' + $result);
+
             $this->auth->permit($user->id);
-            if (($parsedBody['remember_me'] ?? 'off') === 'on') {
-                $rememberToken = User::generateRememberToken();
-                $this->cookie->set('remember_token', $rememberToken);
-                $user->updateRememberToken($rememberToken);
-                $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());
-            }
+            return $response->withRedirect('/profile', 301);
+        } catch (\Exception $e) {
+            $this->flash->addMessage('error', $e->getMessage());
+            throw new RequestErrorException($response->withRedirect('/signup', 301), $e);
         }
-        return $response->withRedirect('/', 301);
     }
 
-    public function signout($request, $response)
+    public function show($request, $response)
     {
-        $this->auth->getAuthenticated()->clearRememberToken();
-        $this->auth->clear();
-        $this->cookie->set('remember_token', '');
-        $response = $response->withHeader('Set-Cookie', $this->cookie->toHeaders());
-        return $response->withRedirect('/', 301);
+        $nameKey = $this->csrf->getTokenNameKey();
+        $valueKey = $this->csrf->getTokenValueKey();
+        $name = $request->getAttribute($nameKey);
+        $value = $request->getAttribute($valueKey);
+        $profile = $this->auth->getAuthenticated();
+        $profile->setNoUpdatePassowrd();
+        return $this->view->render($response, 'profile/edit.html', [
+            'csrfName' => $name,
+            'nameKey' => $nameKey,
+            'valueKey' => $valueKey,
+            'value' => $value,
+            'errors' => $this->flash->getMessage('error'),
+            'profile' => $profile
+        ]);
+    }
+
+    public function update($request, $response)
+    {
+        $params = $request->getParsedBody();
+        $user = $this->auth->getAuthenticated();
+        try {
+            $user->update($params);
+            $this->logger->addInfo('update user');
+        } catch (\Exception $e) {
+            $this->flash->addMessage('error', $e->getMessage());
+        }
+        return $response->withRedirect('/profile', 301);
     }
 }

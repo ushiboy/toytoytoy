@@ -10,6 +10,9 @@ class Base
     protected $view;
     protected $auth;
     protected $cookie;
+    protected $flash;
+    protected $logger;
+    protected $mail;
 
     public function __construct(Container $container)
     {
@@ -17,5 +20,8 @@ class Base
         $this->view = $container->get('view');
         $this->auth = $container->get('auth');
         $this->cookie = $container->get('cookie');
+        $this->flash = $container->get('flash');
+        $this->logger = $container->get('logger');
+        $this->mail = $container->get('mail');
     }
 }

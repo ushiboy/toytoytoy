@@ -6,34 +6,17 @@ class Main extends Base
 
     public function index($request, $response)
     {
-
-        if ($this->auth->getAuthenticated()) {
-            return $this->view->render($response, 'index_signed.html', [
-            ]);
-        }
         $nameKey = $this->csrf->getTokenNameKey();
         $valueKey = $this->csrf->getTokenValueKey();
         $name = $request->getAttribute($nameKey);
         $value = $request->getAttribute($valueKey);
-        return $this->view->render($response, 'index.html', [
+        return $this->view->render($response, 'session/signin.html', [
             'csrfName' => $name,
             'nameKey' => $nameKey,
             'valueKey' => $valueKey,
-            'value' => $value
+            'value' => $value,
+            'errors' => $this->flash->getMessage('error')
         ]);
     }
 
-    public function signUp($request, $response)
-    {
-        $nameKey = $this->csrf->getTokenNameKey();
-        $valueKey = $this->csrf->getTokenValueKey();
-        $name = $request->getAttribute($nameKey);
-        $value = $request->getAttribute($valueKey);
-        return $this->view->render($response, 'signup.html', [
-            'csrfName' => $name,
-            'nameKey' => $nameKey,
-            'valueKey' => $valueKey,
-            'value' => $value
-        ]);
-    }
 }
