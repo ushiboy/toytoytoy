@@ -13,10 +13,11 @@ class MainTest extends \PHPUnit_Framework_TestCase
 {
 
     private $controller;
+    private $app;
 
     public function setUp()
     {
-        $app = new App(Config::get());
+        $this->app = $app = new App(Config::get());
         Dependency::apply($app);
         $this->controller = new Main($app->getContainer());
     }
@@ -29,5 +30,32 @@ class MainTest extends \PHPUnit_Framework_TestCase
         ]);
         $response = $this->controller->index(Request::createFromEnvironment($env), new Response());
         $this->assertEquals($response->getStatusCode(), 200);
+    }
+
+    public function getResponseBody($response)
+    {
+        $body = $response->getBody();
+        if ($body->isSeekable()) {
+            $body->rewind();
+        }
+        $contentLength  = $response->getHeaderLine('Content-Length');
+        if (!$contentLength) {
+            $contentLength = $body->getSize();
+        }
+        $chunkSize = $this->app->getContainer()->get('settings')['responseChunkSize'];
+        $result = [];
+        if (isset($contentLength)) {
+            $totalChunks    = ceil($contentLength / $chunkSize);
+            $lastChunkSize  = $contentLength % $chunkSize;
+            $currentChunk   = 0;
+            while (!$body->eof() && $currentChunk < $totalChunks) {
+                if (++$currentChunk == $totalChunks && $lastChunkSize > 0) {
+                    $chunkSize = $lastChunkSize;
+                }
+                $chunk = $body->read($chunkSize);
+                array_push($result, $chunk);
+            }
+        }
+        return implode($result);
     }
 }
