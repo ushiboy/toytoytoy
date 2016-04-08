@@ -8,6 +8,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\App;
 use Slim\Http\Environment;
+use ToyToyToy\Tests\Helper\HtmlAccessor;
 
 class MainTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,6 +31,11 @@ class MainTest extends \PHPUnit_Framework_TestCase
         ]);
         $response = $this->controller->index(Request::createFromEnvironment($env), new Response());
         $this->assertEquals($response->getStatusCode(), 200);
+        $body = $this->getResponseBody($response);
+        $accessor = new HtmlAccessor($body);
+        var_dump($accessor->find('/html/body/div[1]/form/input[1]')->attr('name'));
+        var_dump($accessor->find('/html/body/div[1]/form/input[1]')->val());
+
     }
 
     public function getResponseBody($response)
