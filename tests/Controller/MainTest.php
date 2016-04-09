@@ -9,59 +9,50 @@ use Slim\Http\Response;
 use Slim\App;
 use Slim\Http\Environment;
 use ToyToyToy\Tests\Helper\HtmlAccessor;
+use ToyToyToy\Tests\Helper\Http;
 
 class MainTest extends \PHPUnit_Framework_TestCase
 {
 
     private $controller;
     private $app;
+    private $container;
 
     public function setUp()
     {
         $this->app = $app = new App(Config::get());
         Dependency::apply($app);
-        $this->controller = new Main($app->getContainer());
+        $this->container = $app->getContainer();
+        $this->controller = new Main($this->container);
     }
 
     public function testIndex()
     {
-        $env = Environment::mock([
+        $csrfName = 'testtesttest';
+        $csrfValue = 'valuevaluevalue';
+        $chunkSize = $this->app->getContainer()->get('settings')['responseChunkSize'];
+        $request = Http::generateRequest(Environment::mock([
             'REQUEST_METHOD' => 'GET',
             'REQUEST_URI' => '/'
+        ]), [
+            'csrf_name' => $csrfName,
+            'csrf_value' => $csrfValue
         ]);
-        $response = $this->controller->index(Request::createFromEnvironment($env), new Response());
+
+        $response = $this->controller->index($request, new Response());
         $this->assertEquals($response->getStatusCode(), 200);
-        $body = $this->getResponseBody($response);
+
+        $body = Http::getResponseBody($response, $chunkSize);
         $accessor = new HtmlAccessor($body);
-        var_dump($accessor->find('/html/body/div[1]/form/input[1]')->attr('name'));
-        var_dump($accessor->find('/html/body/div[1]/form/input[1]')->val());
+
+        $input1 = $accessor->find('/html/body/div[1]/form/input[1]');
+        $this->assertEquals($input1->attr('name'), 'csrf_name');
+        $this->assertEquals($input1->val(), $csrfName);
+
+        $input2 = $accessor->find('/html/body/div[1]/form/input[2]');
+        $this->assertEquals($input2->attr('name'), 'csrf_value');
+        $this->assertEquals($input2->val(), $csrfValue);
 
     }
 
-    public function getResponseBody($response)
-    {
-        $body = $response->getBody();
-        if ($body->isSeekable()) {
-            $body->rewind();
-        }
-        $contentLength  = $response->getHeaderLine('Content-Length');
-        if (!$contentLength) {
-            $contentLength = $body->getSize();
-        }
-        $chunkSize = $this->app->getContainer()->get('settings')['responseChunkSize'];
-        $result = [];
-        if (isset($contentLength)) {
-            $totalChunks    = ceil($contentLength / $chunkSize);
-            $lastChunkSize  = $contentLength % $chunkSize;
-            $currentChunk   = 0;
-            while (!$body->eof() && $currentChunk < $totalChunks) {
-                if (++$currentChunk == $totalChunks && $lastChunkSize > 0) {
-                    $chunkSize = $lastChunkSize;
-                }
-                $chunk = $body->read($chunkSize);
-                array_push($result, $chunk);
-            }
-        }
-        return implode($result);
-    }
 }
