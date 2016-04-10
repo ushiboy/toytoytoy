@@ -3,7 +3,6 @@ namespace ToyToyToy\Tests\Controller;
 
 use ToyToyToy\Controller\Main;
 use ToyToyToy\Config;
-use ToyToyToy\Dependency;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\App;
@@ -30,7 +29,7 @@ class MainTest extends \PHPUnit_Framework_TestCase
     {
         $csrfName = 'testtesttest';
         $csrfValue = 'valuevaluevalue';
-        $chunkSize = $this->app->getContainer()->get('settings')['responseChunkSize'];
+        $chunkSize = $this->container->get('settings')['responseChunkSize'];
         $request = Http::generateRequest(Environment::mock([
             'REQUEST_METHOD' => 'GET',
             'REQUEST_URI' => '/'
@@ -55,4 +54,33 @@ class MainTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testIndex__when_with_error()
+    {
+        Dependency::$storage = [
+            'slimFlash' => [
+                'error' => [
+                    'Invalid email/password combination'
+                ]
+            ]
+        ];
+        $this->app = $app = new App(Config::get());
+        Dependency::apply($app);
+        $this->container = $app->getContainer();
+        $this->controller = new Main($this->container);
+        $chunkSize = $this->container->get('settings')['responseChunkSize'];
+
+        $request = Http::generateRequest(Environment::mock([
+            'REQUEST_METHOD' => 'GET',
+            'REQUEST_URI' => '/'
+        ]));
+
+        $response = $this->controller->index($request, new Response());
+        $this->assertEquals($response->getStatusCode(), 200);
+
+        $body = Http::getResponseBody($response, $chunkSize);
+        $accessor = new HtmlAccessor($body);
+
+        $errorMessage = $accessor->find('/html/body/div[1]/div');
+        $this->assertEquals($errorMessage->text(), 'Invalid email/password combination');
+    }
 }

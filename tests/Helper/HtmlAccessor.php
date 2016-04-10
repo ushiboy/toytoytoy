@@ -47,6 +47,11 @@ class HtmlAccessor
             {
                 return $this->el->getAttribute('value');
             }
+
+            public function text()
+            {
+                return $this->el->textContent;
+            }
         };
     }
 
